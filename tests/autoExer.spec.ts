@@ -1,10 +1,9 @@
-import { register } from 'module';
 import { test } from '../shared/base.ts';
 
 const TITLE = 'Mrs';
 const NAME = 'TestUser';
 const EMAIL = 'test.user123@example.com';
-const PASSWORD = 'password123';
+const PASSWORD = 'Test@1234';
 const DAY = '1';
 const MONTH = 'January';
 const YEAR = '1990';
@@ -18,6 +17,7 @@ const STATE = 'California';
 const CITY = 'Los Angeles';
 const ZIP_CODE = '90001';
 const MOBILE_NUMBER = '09123456789';
+const PRODUCT_ID = 1;
 
 test.describe('Registration Tests', () => {
     test.beforeEach(async ({ registerPage }) => {
@@ -63,6 +63,20 @@ test.describe('Registration Tests', () => {
             await registerPage.clickContinueButton();
         });
     });
+    test('Register User with existing email', async ({ registerPage }) => {
+        await test.step('Click on "Signup/Login" button', async () => {
+            await registerPage.navigateToSignUpPage();
+        });
+        await test.step('Verify "New User Signup!" is visible', async () => {
+            await registerPage.verifyNewUserText();
+        });
+        await test.step('Enter name and already registered email address', async () => {
+            await registerPage.signUp('JohnDoe', EMAIL);
+        });
+        await test.step('Verify error "Email Address already exist!" is visible', async () => {
+            await registerPage.verifyRegisterErrorText();
+        });
+    });
 });
 
 test.describe('Login Tests', () => {
@@ -95,7 +109,7 @@ test.describe('Login Tests', () => {
         await test.step('Enter correct email address and password', async () => {
             await loginPage.login(EMAIL, PASSWORD);
         });
-        await test.step('Verify that user is logged in successfully', async () => {
+        await test.step('Verify that "Logged in as username" is visible', async () => {
             await loginPage.verifyLoggedInAsTextLogin(NAME);
         });
         await test.step('Click on "Delete Account" button', async () => {
@@ -105,5 +119,67 @@ test.describe('Login Tests', () => {
             await registerPage.verifyAccDeletedText();
             await registerPage.clickContinueButton();
         });
+    });
+
+    test('Login User with incorrect email and password', async ({ registerPage, loginPage }) => {
+        await test.step('Navigate to url', async () => {
+            await registerPage.navigateTo();
+        });
+        await test.step('Verify that home page is visible successfully', async () => {
+            await registerPage.verifyHomePage();
+        });
+        await test.step('Click on "Signup/Login" button', async () => {
+            await loginPage.navigateToLogin();
+        });
+        await test.step('Verify "Login to your account" is visible', async () => {
+            await loginPage.verifyLoginToYourAccText();
+        });
+        await test.step('Enter incorrect email address and password', async () => {
+            await loginPage.login('wrong@example.com', 'wrongpassword');
+        });
+        await test.step('Verify error "Your email or password is incorrect!" is visible', async () => {
+            await loginPage.verifyLoginErrorText();
+        });
+    });
+    test('Logout User', async ({ registerPage, loginPage }) => {
+        await test.step('Navigate to url', async () => {
+            await registerPage.navigateTo();
+        });
+        await test.step('Verify that home page is visible successfully', async () => {
+            await registerPage.verifyHomePage();
+        });
+        await test.step('Click on "Signup/Login" button', async () => {
+            await loginPage.navigateToLogin();
+        });
+        await test.step('Verify "Login to your account" is visible', async () => {
+            await loginPage.verifyLoginToYourAccText();
+        });
+        await test.step('Enter correct email address and password', async () => {
+            await loginPage.login(EMAIL, PASSWORD);
+        });
+        await test.step('Verify that "Logged in as username" is visible', async () => {
+            await loginPage.verifyLoggedInAsTextLogin(NAME);
+        });
+        await test.step('Click "Logout" button', async () => {
+            await loginPage.clickLogoutButton();
+        });
+        await test.step('Verify that user is navigated to login page ', async () => {
+            await loginPage.verifyLoginPage();
+        });
+    });
+});
+
+test.describe('Product Tests', () => {
+    test.beforeEach(async ({ registerPage }) => {
+        await registerPage.navigateTo();
+        await registerPage.verifyHomePage();
+    });
+    test('Verify All Products and product detail page', async ({ productPage }) => {
+        await productPage.clickProductsButton();
+        await productPage.verifyProductsPage();
+        await productPage.verifyProductListVisible();
+        await productPage.clickProductById(PRODUCT_ID);
+        await productPage.verifyProductDetailsPage(PRODUCT_ID);
+        await productPage.verifyProductDetailsContent();
     });
 });

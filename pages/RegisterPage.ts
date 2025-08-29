@@ -33,6 +33,7 @@ export class RegisterPage {
     public readonly loggedInAsText: Locator;
     public readonly deleteAccButton: Locator;
     public readonly accDeletedText: Locator;
+    public readonly registerErrorText: Locator;
 
     constructor(public readonly page: Page) {
         this.homePage = page.locator('#slider');
@@ -66,6 +67,7 @@ export class RegisterPage {
         this.loggedInAsText = page.getByText('Logged in as');
         this.deleteAccButton = page.locator('a[href="/delete_account"]');
         this.accDeletedText = page.getByText('Account Deleted!');
+        this.registerErrorText = page.getByText('Email Address already exist!');
 
     }
 
@@ -172,5 +174,10 @@ export class RegisterPage {
     async verifyAccDeletedText() {
         await expect(this.accDeletedText).toBeVisible();
         await expect(this.accDeletedText).toHaveText('Account Deleted!');
+    }
+
+    async verifyRegisterErrorText() {
+        await expect(this.registerErrorText).toBeVisible();
+        await expect(this.registerErrorText).toHaveText('Email Address already exist!');
     }
 }

@@ -9,6 +9,7 @@ export class LoginPage {
     public readonly loginButton: Locator;
     public readonly loggedInAsTextLogin: Locator;
     public readonly logoutButton: Locator;
+    public readonly loginErrorText: Locator;
 
     constructor(public readonly page: Page) {
         this.toLoginPage = page.locator('a[href="/login"]');
@@ -18,6 +19,7 @@ export class LoginPage {
         this.loginButton = page.locator('[data-qa="login-button"]');
         this.loggedInAsTextLogin = page.getByText('Logged in as');
         this.logoutButton = page.locator('a[href="/logout"]');
+        this.loginErrorText = page.getByText('Your email or password is incorrect!');
     }
 
     async navigateToLogin() {
@@ -26,11 +28,12 @@ export class LoginPage {
 
     async verifyLoginToYourAccText() {
         await expect(this.loginToYourAccText).toBeVisible();
+        await expect(this.loginToYourAccText).toHaveText('Login to your account');
     }
 
     /**
-     * @param emailLogin - The email to sign in with
-     * @param passwordLogin - The password to sign in with
+     * @param emailLogin The email to sign in with
+     * @param passwordLogin The password to sign in with
      */
 
     async login(emailLogin: string, passwordLogin: string) {
@@ -46,5 +49,17 @@ export class LoginPage {
 
     async clickLogoutButton() {
         await this.logoutButton.click();
+    }
+
+    async verifyLoginErrorText() {
+        await expect(this.loginErrorText).toBeVisible();
+        await expect(this.loginErrorText).toHaveText('Your email or password is incorrect!');
+    }
+
+    async verifyLoginPage() {
+        await this.page.waitForURL("**/login");
+        await expect(this.page).toHaveURL(/.*\/login/);
+        await expect(this.loginToYourAccText).toBeVisible();
+        await expect(this.loginToYourAccText).toHaveText('Login to your account');
     }
 }

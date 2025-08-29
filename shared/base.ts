@@ -1,6 +1,7 @@
 import { test as base, expect, request } from '@playwright/test';
 import { RegisterPage } from '../pages/RegisterPage';
 import { LoginPage } from '../pages/LoginPage';
+import { ProductPage } from '../pages/ProductPage';
 
 // This file is used to set up the base test environment
 // It will be used to create a custom test fixture that can be reused across tests
@@ -9,6 +10,7 @@ import { LoginPage } from '../pages/LoginPage';
 type MyFixtures = {
     registerPage: RegisterPage;
     loginPage: LoginPage;
+    productPage: ProductPage;
 };
 
 export const test = base.extend<MyFixtures>({
@@ -17,6 +19,9 @@ export const test = base.extend<MyFixtures>({
     },
     loginPage: async ({ page }, use) => {
         await use(new LoginPage(page));
+    },
+    productPage: async ({ page }, use) => {
+        await use(new ProductPage(page));
     },
     // Can add more fixtures here as needed
 });
