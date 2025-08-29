@@ -90,6 +90,7 @@ export class RegisterPage {
     /**
      * @param nameSignup - The username to sign in with
      * @param emailSignup - The email to sign in with
+     * @param title - The title (Mr/Mrs) to select
      * @param passwordSignup - The password to sign in with
      * @param day - The day of birth to select
      * @param month - The month of birth to select
@@ -117,7 +118,14 @@ export class RegisterPage {
         await expect(this.enterAccText).toHaveText('Enter Account Information');
     }
 
-    async fillDetails(passwordSignup: string, day: string, month: string, year: string): Promise<void> {
+    async fillDetails(title: string, passwordSignup: string, day: string, month: string, year: string): Promise<void> {
+        if (title.toLowerCase() === "mr") {
+        await this.titleMr.click();
+        } else if (title.toLowerCase() === "mrs") {
+            await this.titleMrs.click();
+        } else {
+            console.log(`Invalid title provided: ${title}`);
+        }
         await this.passwordInput.fill(passwordSignup);
         await this.days.selectOption(day);
         await this.months.selectOption(month);

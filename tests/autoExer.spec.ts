@@ -1,5 +1,7 @@
+import { register } from 'module';
 import { test } from '../shared/base.ts';
 
+const TITLE = 'Mrs';
 const NAME = 'TestUser';
 const EMAIL = 'test.user123@example.com';
 const PASSWORD = 'password123';
@@ -36,7 +38,7 @@ test.describe('Registration Tests', () => {
             await registerPage.verifyEnterAccText();
         });
         await test.step('Fill details: Title, Password, Date of birth, Newsletter, Special offers', async () => {
-            await registerPage.fillDetails(PASSWORD, DAY, MONTH, YEAR);
+            await registerPage.fillDetails(TITLE, PASSWORD, DAY, MONTH, YEAR);
         });
         await test.step('Fill details: First name, Last name, Company, Address, Address2, Country, State, City, Zipcode, Mobile Number', async () => {
             await registerPage.fillPersonalDetails(FIRST_NAME, LAST_NAME, COMPANY, ADDRESS1, ADDRESS2, COUNTRY, STATE, CITY, ZIP_CODE, MOBILE_NUMBER);
@@ -54,6 +56,49 @@ test.describe('Registration Tests', () => {
             await registerPage.verifyLoggedInAsText(NAME);
         });
         await test.step('Click "Delete Account" button', async () => {
+            await registerPage.clickDeleteAccount();
+        });
+        await test.step('Verify "ACCOUNT DELETED!" is visible', async () => {
+            await registerPage.verifyAccDeletedText();
+            await registerPage.clickContinueButton();
+        });
+    });
+});
+
+test.describe('Login Tests', () => {
+    test.beforeEach(async ({ registerPage, loginPage }) => {
+        await registerPage.navigateTo();
+        await registerPage.verifyHomePage();
+        await registerPage.navigateToSignUpPage();
+        await registerPage.signUp(NAME, EMAIL);
+        await registerPage.fillDetails(TITLE, PASSWORD, DAY, MONTH, YEAR);
+        await registerPage.fillPersonalDetails(FIRST_NAME, LAST_NAME, COMPANY, ADDRESS1, ADDRESS2, COUNTRY, STATE, CITY, ZIP_CODE, MOBILE_NUMBER);
+        await registerPage.clickCreateAccButton();
+        await registerPage.verifyAccCreatedText();
+        await registerPage.clickContinueButton();
+        await registerPage.verifyLoggedInAsText(NAME);
+        await loginPage.clickLogoutButton();
+    });
+    test('Login User with correct email and password', async ({ registerPage, loginPage }) => {
+        await test.step('Navigate to url', async () => {
+            await registerPage.navigateTo();
+        });
+        await test.step('Verify that home page is visible successfully', async () => {
+            await registerPage.verifyHomePage();
+        });
+        await test.step('Click on "Signup/Login" button', async () => {
+            await loginPage.navigateToLogin();
+        });
+        await test.step('Verify "Login to your account" is visible', async () => {
+            await loginPage.verifyLoginToYourAccText();
+        });
+        await test.step('Enter correct email address and password', async () => {
+            await loginPage.login(EMAIL, PASSWORD);
+        });
+        await test.step('Verify that user is logged in successfully', async () => {
+            await loginPage.verifyLoggedInAsTextLogin(NAME);
+        });
+        await test.step('Click on "Delete Account" button', async () => {
             await registerPage.clickDeleteAccount();
         });
         await test.step('Verify "ACCOUNT DELETED!" is visible', async () => {
