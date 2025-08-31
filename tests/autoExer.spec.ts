@@ -17,7 +17,11 @@ const STATE = 'California';
 const CITY = 'Los Angeles';
 const ZIP_CODE = '90001';
 const MOBILE_NUMBER = '09123456789';
-const PRODUCT_ID = 1;
+const PRODUCT_ID = 2;
+const SECOND_PRODUCT_ID = 6;
+const PRODUCT_NAME = 'Sleeveless';
+const PRODUCT_INDEX = 1;
+const SECOND_PRODUCT_INDEX = 5;
 
 test.describe('Registration Tests', () => {
     test.beforeEach(async ({ registerPage }) => {
@@ -175,11 +179,72 @@ test.describe('Product Tests', () => {
         await registerPage.verifyHomePage();
     });
     test('Verify All Products and product detail page', async ({ productPage }) => {
-        await productPage.clickProductsButton();
-        await productPage.verifyProductsPage();
-        await productPage.verifyProductListVisible();
-        await productPage.clickProductById(PRODUCT_ID);
-        await productPage.verifyProductDetailsPage(PRODUCT_ID);
-        await productPage.verifyProductDetailsContent();
+        await test.step('Click on "Products" button', async () => {
+            await productPage.clickProductsButton();
+        });
+        await test.step('Verify user is navigated to ALL PRODUCTS page successfully', async () => {
+            await productPage.verifyProductsPage();
+        });
+        await test.step('Verify product list is visible', async () => {
+            await productPage.verifyProductListVisible();
+        });
+        await test.step('Click on "View Product" of first product', async () => {
+            await productPage.clickProductById(PRODUCT_ID);
+        });
+        await test.step('User is landed to product detail page', async () => {
+            await productPage.verifyProductDetailsPage(PRODUCT_ID);
+        });
+        await test.step('Verify that detail is visible: product name, category, price, availability, condition, brand', async () => {
+            await productPage.verifyProductDetailsContent();
+        });
+    });
+    test('Search Product', async ({ productPage }) => {
+        await test.step('Click on "Products" button', async () => {
+            await productPage.clickProductsButton();
+        });
+        await test.step('Verify user is navigated to ALL PRODUCTS page successfully', async () => {
+            await productPage.verifyProductsPage();
+        });
+        await test.step('Enter product name in search input and click search button', async () => {
+            await productPage.searchProduct(PRODUCT_NAME);
+        });
+        await test.step('Verify "SEARCHED PRODUCTS" is visible', async () => {
+            await productPage.verifySearchedProducts();
+        });
+        await test.step('Verify all the products related to search are visible', async () => {
+            await productPage.verifySearchedProductListVisible();
+        });
+    });
+});
+
+test.describe('Cart Tests', () => {
+    test.beforeEach(async ({ registerPage }) => {
+        await registerPage.navigateTo();
+        await registerPage.verifyHomePage();
+    });
+    test('Add Products in Cart', async ({ productPage, cartPage }) => {
+        await test.step('Click on "Products" button', async () => {
+            await productPage.clickProductsButton();
+        });
+        await test.step(' Hover over first product and click "Add to cart"', async () => {
+            await productPage.addProductToCart(PRODUCT_ID);
+        });
+        await test.step('Click "Continue Shopping" button', async () => {
+            await productPage.clickContinueShoppingButton();
+        });
+        await test.step('Hover over second product and click "Add to cart"', async () => {
+            await productPage.addProductToCart(SECOND_PRODUCT_ID);
+        });
+        await test.step('Click "View Cart" button', async () => {
+            await productPage.clickViewCartButton();
+        });
+        await test.step('Verify both products are added to Cart', async () => {
+            await cartPage.verifyProductsAddedToCart(PRODUCT_ID);
+            await cartPage.verifyProductsAddedToCart(SECOND_PRODUCT_ID);
+        });
+        await test.step('Verify price, quantity and total price', async () => {
+            await cartPage.verifyPriceQuantityTotal(PRODUCT_ID);
+            await cartPage.verifyPriceQuantityTotal(SECOND_PRODUCT_ID);
+        });
     });
 });
